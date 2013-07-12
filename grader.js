@@ -25,6 +25,7 @@ References:
 var fs = require('fs');
 var program = require('commander');
 var cheerio = require('cheerio');
+var restler = require('restler');
 var HTMLFILE_DEFAULT = "index.html";
 var CHECKSFILE_DEFAULT = "checks.json";
 
@@ -62,14 +63,36 @@ var clone = function(fn) {
     return fn.bind({});
 };
 
+// Writing file to disk, could be better.
+var retrieveURL = function(url) {
+    restler.get(url).on('complete', function(result) {
+        if(result instanceof Error) {
+            console.log("%s does not exist. Exit 1", url);
+            process.exit(1);
+        } else {
+            var htmlfile = "grading-tmp.html";
+            fs.writeFileSync(htmlfile, result);
+            processCheck(htmlfile);
+        }
+    });
+};
+
+var processCheck = function(htmlfile) {
+    var checkJson = checkHtmlFile(htmlfile, program.checks);
+    var outJson = JSON.stringify(checkJson, null, 4);
+    console.log(outJson);
+};
+
 if(require.main == module) {
     program
         .option('-c, --checks <check_file>', 'Path to checks.json', clone(assertFileExists), CHECKSFILE_DEFAULT)
         .option('-f, --file <html_file>', 'Path to index.html', clone(assertFileExists), HTMLFILE_DEFAULT)
+        .option('-u, --url <page_url>', 'URL to a HTML page')
         .parse(process.argv);
-    var checkJson = checkHtmlFile(program.file, program.checks);
-    var outJson = JSON.stringify(checkJson, null, 4);
-    console.log(outJson);
+   
+    var status = program.url ? retrieveURL(program.url) : processCheck(program.file);
+
+
 } else {
     exports.checkHtmlFile = checkHtmlFile;
 }
