@@ -65,14 +65,15 @@ var clone = function(fn) {
 
 // Writing file to disk, could be better.
 var retrieveURL = function(url) {
-    restler.get(url).on('complete', function(result) {
-        if(result instanceof Error) {
+    restler.get(url).on('complete', function(data) {
+        if(data instanceof Error) {
             console.log("%s does not exist. Exit 1", url);
             process.exit(1);
-        } else {
-            var htmlfile = "grading-tmp.html";
-            fs.writeFileSync(htmlfile, result);
-            processCheck(htmlfile);
+        }
+        else {
+            var file = "grading-tmp.html";
+            fs.writeFileSync(file, data);
+            processCheck(file);
         }
     });
 };
