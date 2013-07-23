@@ -1,0 +1,15 @@
+{
+  "name": "bitstarter",
+  "version": "0.0.1",
+  "main": "web.js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "git://github.com/twitter/bootstrap.git#~2.3.2"
+  }
+}
